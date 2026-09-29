@@ -14,15 +14,15 @@ const generateTokens = async (userId, res) => {
     res.cookie('jwt', accessToken, {
         maxAge: 15 * 60 * 1000, // 15 minutes
         httpOnly: true,
-        sameSite: 'strict',
-        secure: process.env.NODE_ENV !== 'development',
+        sameSite: process.env.NODE_ENV !== "development" ? "none" : "strict",
+        secure: process.env.NODE_ENV !== "development",
     });
 
     res.cookie('refreshToken', refreshToken, {
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         httpOnly: true,
-        sameSite: 'strict',
-        secure: process.env.NODE_ENV !== 'development',
+        sameSite: process.env.NODE_ENV !== "development" ? "none" : "strict",
+        secure: process.env.NODE_ENV !== "development",
     });
 
     return { accessToken, refreshToken };
@@ -110,8 +110,8 @@ export const logout = async (req, res) => {
         if (req.user) {
             await redisClient.del(`refreshToken:${req.user._id}`);
         }
-        res.cookie('jwt', '', { maxAge: 0 });
-        res.cookie('refreshToken', '', { maxAge: 0 });
+        res.cookie('jwt', '', { maxAge: 0, sameSite: process.env.NODE_ENV !== "development" ? "none" : "strict", secure: process.env.NODE_ENV !== "development" });
+        res.cookie('refreshToken', '', { maxAge: 0, sameSite: process.env.NODE_ENV !== "development" ? "none" : "strict", secure: process.env.NODE_ENV !== "development" });
         res.status(200).json({ message: 'Logged out successfully' });
     } catch (error) {
         console.error('Error in logout controller:', error.message);
